@@ -5,6 +5,11 @@ from config import *
 import cv2
 import random
 
+from config import *
+
+def load_sisr_model():
+    model=load_model(f"{MODEL_NAME}.h5")
+    return model
 
 def preprocess(image):
     expanded=tf.expand_dims(image, axis=0)
@@ -14,12 +19,8 @@ def preprocess(image):
 def predict(image, model):
     # 256x256 image received from api ready for model
 
-
     processed=preprocess(image)
     result=model.predict(processed)[0]
     # result is also normalized
-    cv2.imshow("test_final", result)
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
     return result

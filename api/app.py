@@ -1,5 +1,5 @@
 from ast import Bytes
-from fastapi import FastAPI, UploadFile, File, Form, Request
+from fastapi import FastAPI, UploadFile, File, Form, Request, Response
 from typing import Optional
 import uvicorn
 import sys
@@ -10,10 +10,10 @@ import cv2
 from fastapi.middleware.cors import CORSMiddleware
 import sys
 sys.path.append("./src/")
-from src.utils import *
 from src.predict import *
 from fastapi.responses import JSONResponse
 import argparse
+import json
 
 
 
@@ -36,7 +36,7 @@ async def test():
     return {"Server is Running!!!"}
 
 
-@application.post("/upload/")
+@application.post("/upload/", response_class=JSONResponse)
 async def upload(request: Request):
     data= np.array(await request.json())
     # remove alpha channel from input image
@@ -46,41 +46,16 @@ async def upload(request: Request):
     # normalization
     data/=255.0
 
-    cv2.imshow("test_initial ", data)
+    # model prediction
+    result=predict(data, model)
 
-    predict(data, model)
+    # convert to bgra for opencv.js
+    result=cv2.cvtColor(result, cv2.COLOR_RGB2BGRA)
 
-
-@application.post("/upload_img/", response_class=JSONResponse)
-async def upload_img(file: UploadFile = File(...)):
-    # get and convert image to numpy array
-    data=await file.read()
-    print(data)
-    img = Image.open(BytesIO(data))
-    # convert PIL image to numpy array and 'BGR' to 'RGB'
-    img = cv2.cvtColor(np.asarray(img), cv2.COLOR_BGR2RGB)
-    cv2.imshow("received image ",img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    """
-    try:
-        pred, prob, coords = predict(img, model)
-        return {
-            "Predicted":  str(pred),
-            "Probability": str(prob),
-            "x_min": str(coords[0]),
-            "y_min": str(coords[1]),
-            "x_max": str(coords[2]),
-            "y_max": str(coords[3])
-        }
-    except: 
-        # face detection failed!!
-        return {"No Faces, Try Again!!"}
-    """
-    
-
-    
+    # convert to json for sending
+    result=json.dumps(result.tolist())
+    return result
+ 
 
 
 
