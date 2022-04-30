@@ -8,7 +8,9 @@
 *.csv
 *.h5
 *.ipynb
-*.txt
+
+
+configs.txt
 
 /venv/
 
