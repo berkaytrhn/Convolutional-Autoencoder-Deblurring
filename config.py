@@ -18,7 +18,7 @@ VALIDATION_HIGH_RES_DATA_FOLDER="5_class_validation_high_res_data"
 VALIDATION_LOW_RES_DATA_FOLDER="5_class_validation_low_res_data"
 
 
-MODEL_IMAGE_NAME="model.png"
+MODEL_IMAGE_NAME="model.jpg"
 LOG_FOLDER="logs"
 DATASET_FOLDER_COUNT=1
 MODEL_NAME="super_resolution"
